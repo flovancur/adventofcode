@@ -1,79 +1,83 @@
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Main {
 
-    public boolean checkDecreasing(int[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i - 1] < arr[i]) {
-                return false;
-            }
+    public boolean checkDecreasing(List<Integer> arr) {
+        for (int i = 1; i < arr.size(); i++) {
+            if (arr.get(i - 1) < arr.get(i)) return false;
         }
         return true;
     }
 
-    public boolean checkIncreasing(int[] arr) {
-        for (int i = 1; i < arr.length; i++) {
-            if (arr[i - 1] > arr[i]) {
-                return false;
-            }
+    public boolean checkIncreasing(List<Integer> arr) {
+        for (int i = 1; i < arr.size(); i++) {
+            if (arr.get(i - 1) > arr.get(i)) return false;
         }
         return true;
     }
 
-    public boolean checkSafetyArray(int[] arr) {
+    public boolean checkSafetyArray(List<Integer> arr) {
         if (checkDecreasing(arr)) {
-            for (int i = 1; i < arr.length; i++) {
-                if (
-                    arr[i - 1] - arr[i] < 1 || arr[i - 1] - arr[i] > 3
-                ) return false;
+            for (int i = 1; i < arr.size(); i++) {
+                if (arr.get(i - 1) - arr.get(i) < 1 || arr.get(i - 1) - arr.get(i) > 3) return false;
             }
+            return true;
         }
+
         if (checkIncreasing(arr)) {
-            for (int i = 1; i < arr.length; i++) {
-                if (
-                    arr[i - 1] - arr[i] > -1 || arr[i - 1] - arr[i] < -3
-                ) return false;
+            for (int i = 1; i < arr.size(); i++) {
+                if (arr.get(i - 1) - arr.get(i) > -1 || arr.get(i - 1) - arr.get(i) < -3) return false;
             }
+            return true;
         }
 
-        if (!checkDecreasing(arr) && !checkIncreasing(arr)) return false;
+        return false;
+    }
 
-        return true;
+    public boolean isSafeWithOneRemoval(List<Integer> arr) {
+        for (int i = 0; i < arr.size(); i++) {
+            List<Integer> modifiedArr = new ArrayList<>(arr);
+            modifiedArr.remove(i);
+            if (checkSafetyArray(modifiedArr)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
         Main element = new Main();
-        List<int[]> arrays = new ArrayList<int[]>();
+        List<Integer[]> arrays = new ArrayList<>();
         int count = 0;
+
         try {
-            String filePath =
-                "/home/florian/Dokumente/Development/AdventRiddles/data_day_2.txt";
-            Path path = Path.of(filePath, args);
+            String filePath = "data_day_2.txt";
+            Path path = Path.of(filePath);
             List<String> lines = Files.readAllLines(path);
 
-            lines.forEach(ele -> {
-                String[] temp = ele.split(" ");
-                int[] tempInt = new int[temp.length];
+            for (String line : lines) {
+                String[] temp = line.split(" ");
+                Integer[] tempInt = new Integer[temp.length];
                 for (int i = 0; i < temp.length; i++) {
                     tempInt[i] = Integer.parseInt(temp[i]);
                 }
                 arrays.add(tempInt);
-            });
-            for (int i = 0; i < arrays.get(4).length; i++) {
-                System.out.println(arrays.get(4)[i]);
             }
-            for (int[] e : arrays) {
-                System.out.println(element.checkSafetyArray(e));
-                if (element.checkSafetyArray(e)) {
+
+            for (Integer[] e : arrays) {
+                List<Integer> list = Arrays.asList(e);
+                if (element.checkSafetyArray(list) || element.isSafeWithOneRemoval(list)) {
                     count++;
                 }
             }
-            System.err.println(count);
+
+            System.out.println(count);
         } catch (Exception e) {
-            System.out.println("Ein fehler ist aufgetreten.");
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
